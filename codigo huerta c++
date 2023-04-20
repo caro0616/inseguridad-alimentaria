@@ -1,7 +1,7 @@
 // Incluimos librerías
 #include "DHT.h"
 // Definimos el pin digital donde se conecta el sensor
-#define DHTPIN 2
+#define DHTPIN 3
 // Dependiendo del tipo de sensor
 #define DHTTYPE DHT11
  // Inicializamos el sensor DHT11
@@ -76,7 +76,7 @@ if (isnan(h) || isnan(t) || isnan(f)) {
   humedad = map(humedad, 0, 1023, 0, 100); // Convierte el valor analógico a un valor de humedad del 0 al 100%
   
  
-  String datos_sensor = String(h) + "*" + String(t)+ "*" + String(f) + "*" + String(hic)+ "*" + String(hif); // Concatenar los datos en un string
+  String datos_sensor = String (h) + "Humedad" + String (t) + "Temperatura_celsius" + String (f) + "Temperatura" + String (hic) + "indice de calor calsuis" + String (hif) + "indice de calor f"; // Concatenar los datos en un string
   Serial.println(datos_sensor);
 
 }
