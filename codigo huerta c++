@@ -1,0 +1,82 @@
+// Incluimos librerías
+#include "DHT.h"
+// Definimos el pin digital donde se conecta el sensor
+#define DHTPIN 2
+// Dependiendo del tipo de sensor
+#define DHTTYPE DHT11
+ // Inicializamos el sensor DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+const int sensorPin = A0;  // Define el pin analógico al que está conectado el sensor
+float humedad;               // Variable para almacenar la lectura del sensor
+
+
+//Leds
+const int LEDA=13;
+const int LEDAZ=12;
+const int LEDV=11;
+const int LEDR=10;
+ 
+void setup() {
+  // Inicializamos comunicación serie
+  Serial.begin(9600);
+ 
+  // Comenzamos el sensor DHT
+  dht.begin();
+
+  //Inicializamos el pin del led como salida
+  pinMode(LEDA,OUTPUT);
+  pinMode(LEDAZ,OUTPUT);
+  pinMode(LEDV,OUTPUT);
+  pinMode(LEDR,OUTPUT);
+}
+ 
+void loop() {
+    // Esperamos 5 segundos entre medidas
+  delay(5000);
+ 
+  // Leemos la humedad relativa
+  float h = dht.readHumidity();
+  // Leemos la temperatura en grados centígrados (por defecto)
+  float t = dht.readTemperature();
+  // Leemos la temperatura en grados Fahreheit
+  float f = dht.readTemperature(true);
+   
+ // Comprobamos si ha habido algún error en la lectura
+if (isnan(h) || isnan(t) || isnan(f)) {
+   Serial.println("Error obteniendo los datos del sensor DHT11");
+   return;
+  }
+ //Encerder led Azul h >=80% y encerder Amarillo h<=70%
+  if (h <=70){
+    digitalWrite(LEDA,HIGH);
+    digitalWrite(LEDAZ,LOW);
+  }
+  if (h >=80) {
+    digitalWrite(LEDAZ,HIGH);
+    digitalWrite(LEDA,LOW);
+  }
+ //Encerder led Roja t >=20*C y encerder Verde t<12*C
+  if (t<12){
+    digitalWrite(LEDV,HIGH);
+    digitalWrite(LEDR,LOW);
+  }
+  if (t>=20) {
+    digitalWrite(LEDR,HIGH);
+    digitalWrite(LEDV,LOW);
+ }
+    
+  // Calcular el índice de calor en Fahreheit
+  float hif = dht.computeHeatIndex(f, h);
+  // Calcular el índice de calor en grados centígrados
+  float hic = dht.computeHeatIndex(t, h, false);
+
+  // Humedad del suelo
+  humedad = analogRead(sensorPin);        // Lee el valor analógico del sensor
+  humedad = map(humedad, 0, 1023, 0, 100); // Convierte el valor analógico a un valor de humedad del 0 al 100%
+  
+ 
+  String datos_sensor = String(h) + "*" + String(t)+ "*" + String(f) + "*" + String(hic)+ "*" + String(hif); // Concatenar los datos en un string
+  Serial.println(datos_sensor);
+
+}
